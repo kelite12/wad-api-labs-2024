@@ -1,0 +1,9 @@
+<html>
+    <head>
+        <title>Tasky API</title>
+    </head>
+    <body>
+        <h1>The Tasky API</h1>
+    </body>
+
+</html>
