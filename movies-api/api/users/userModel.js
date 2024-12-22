@@ -19,17 +19,30 @@ const UserSchema = new Schema({
     },
   },
 });
+UserSchema.methods.comparePassword = async function (passw) { 
+  return await bcrypt.compare(passw, this.password); 
+}
+UserSchema.statics.findByUserName = function (username) {
+  return this.findOne({ username: username });
+};
 
-UserSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next(); // Skip hashing if password hasn't changed
-  try {
-    const salt = await bcrypt.genSalt(10); // Generate salt
-    this.password = await bcrypt.hash(this.password, salt); // Hash password
-    next();
+UserSchema.pre('save', async function(next) {
+  const saltRounds = 10; // You can adjust the number of salt rounds
+  //const user = this;
+  if (this.isModified('password') || this.isNew) {
+    try {
+      const hash = await bcrypt.hash(this.password, saltRounds);
+      this.password = hash;
+      next();
   } catch (error) {
-    next(error);
+     next(error);
+  }
+
+  } else {
+      next();
   }
 });
+
 
 UserSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
